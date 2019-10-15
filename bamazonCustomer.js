@@ -38,12 +38,14 @@ function promptForId(inventory) {
         .prompt([{
             type: "input",
             name: "choice",
-            message: "What is the ID of the item that you would like to purchase?",
+            message: "What is the ID of the item that you would like to purchase? [Press 'Q' to exit]",
             validate: function(input) {
-                return !isNaN(input);
+                return !isNaN(input) || input.toLowerCase() === "q";
             }
         }])
         .then(function(input){
+            // checks if they want to exit
+            exit(input.choice);
             var choiceId = parseInt(input.choice);
             // checks if the item is available
             var product = checkInventory(choiceId, inventory);
@@ -58,17 +60,19 @@ function promptForId(inventory) {
         });
 }
 
+// Function that asks the customer how much of the item they would like to purchase
 function promptForQuantity(product) {
     inquirer
         .prompt([{
             type: "input",
             name: "quantity",
-            message: "How many would you like to order?",
+            message: "How many would you like to order? [Press 'Q' to exit]",
             validate: function(input) {
-                return input > 0;
+                return input > 0 || input.toLowerCase() === "q";
             }
         }])
         .then(function(val){
+            exit(val.quantity)
             var quantity = parseInt(val.quantity);
             if (quantity > product.stock_quantity) {
                 console.log(`We do not have that much stock for that item.\nPlease try again.`)
@@ -79,6 +83,7 @@ function promptForQuantity(product) {
         })
 }
 
+// Function that updates the inventory with current purchase
 function makePurchase(product, quantity) {
     connection.query("UPDATE products SET stock_quantity = stock_quantity - ?, WHERE item_id = ?", [quantity, product.item_id],
     function(err, res){
@@ -88,6 +93,7 @@ function makePurchase(product, quantity) {
     })
 } 
 
+//Function that checks if the item exists in the inventory
 function checkInventory(choiceId, inventory) {
     for (var i = 0; i < inventory.length; i++) {
         if (inventory[i].item_id == choiceId) {
@@ -95,4 +101,12 @@ function checkInventory(choiceId, inventory) {
         }
     }
     return null;
+}
+
+// Function that checks if the user wants to quit Bamazon
+function exit(input) {
+    if (input.toLowerCase() === "q") {
+        console.log(`Thank you for shopping with Bamazon!`)
+        process.exit(0);
+    }
 }
