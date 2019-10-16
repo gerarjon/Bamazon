@@ -85,11 +85,11 @@ function promptForQuantity(product) {
 
 // Function that updates the inventory with current purchase
 function makePurchase(product, quantity) {
-    connection.query("UPDATE products SET stock_quantity = stock_quantity - ?, WHERE item_id = ?", [quantity, product.item_id],
+    connection.query("UPDATE products SET stock_quantity = stock_quantity - ? WHERE item_id = ?", [quantity, product.item_id],
     function(err, res){
         if (err) throw err;
-        console.log(`Your purchase of ${quantity} ${product.product_name} has been made!`)
-        listItems();
+        console.log(`Your purchase of ${quantity} ${product.product_name} has been made!\n`);
+        exitAfterPurchase();
     })
 } 
 
@@ -101,6 +101,30 @@ function checkInventory(choiceId, inventory) {
         }
     }
     return null;
+}
+
+// Function that asks if they want to exit after making a purchase
+function exitAfterPurchase() {
+    inquirer
+        .prompt([{
+            type: "input",
+            name: "choice",
+            message: "Would you like to make another purchase? [Press 'Y/Q']",
+            validate: function(input) {
+                if (input.toLowerCase() === "y") {
+                    return input === "y";
+                } else {
+                    return input.toLowerCase() === "q";
+                }
+            }
+        }])
+        .then(function(input) {
+            if (input.choice === "y") {
+                listItems();
+            } else {
+                exit(input.choice);
+            }
+        })
 }
 
 // Function that checks if the user wants to quit Bamazon
