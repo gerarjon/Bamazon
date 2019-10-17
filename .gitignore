@@ -3,3 +3,5 @@ package-lock.json
 .env
 bamazonCustomerSeeds.sql
 test.js
+images
+.DS_Store

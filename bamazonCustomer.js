@@ -85,10 +85,10 @@ function promptForQuantity(product) {
 
 // Function that updates the inventory with current purchase
 function makePurchase(product, quantity) {
-    connection.query("UPDATE products SET stock_quantity = stock_quantity - ? WHERE item_id = ?", [quantity, product.item_id],
+    connection.query("UPDATE products SET stock_quantity = stock_quantity - ? WHERE item_id = ?", [quantity, product.item_id, product.price],
     function(err, res){
         if (err) throw err;
-        console.log(`Your purchase of ${quantity} ${product.product_name} has been made!\n`);
+        console.log(`Your purchase of ${quantity} ${product.product_name} has been made!\nThe total cost of your purchase is $${quantity * product.price}`);
         exitAfterPurchase();
     })
 } 
